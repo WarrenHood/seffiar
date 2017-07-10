@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+  <body>
+	<div id="splash">
+	  <h1 id="title">S.E.F.F.I.A.R</h1>
+	</div>
+	<center>
+    <table id="grid">
+	</table>
+	  <h1 id="info"></h1>
+	  <div id="menutoggle"><b>Menu</b></div>
+	  <div id="menu" style="color:lightgreen;font-weight:heavy;">
+		<h1 onclick="animating='down';menuOff();setTimeout(playComputer,2000);">Single Player Game</h1><br>
+		<h1 onclick="animating='down';menuOff();setTimeout(playMulti,2000);">Multiplayer Game</h1><br>
+		<h1>Difficulty</h1>
+		<select id="difficulty">
+		  <option id="easy" value=2>Easy</option>
+		  <option id="normal" value=3>Normal</option>
+		  <option id="hard" value=4>Hard(Experimental)</option>
+		</select><br>
+		<h1>First Player</h1>
+		<input type=radio checked name="fp" style="height:50px;width:50px;color:pink;"><span style="color:white;font-size:40pt;">Pink</span><br>
+		<input type=radio name="fp" style="height:50px;width:50px;color:black;"><span style="color:white;font-size:40pt;">Black</span><br>
+		<h1>Multiplayer Dimensions</h1>
+		<select id="cols">
+		  <option value=7>7</option>
+		  <option value=8>8</option>
+		  <option value=9>9</option>
+		  <option value=10>10</option>
+		  <option value=11>11</option>
+		  <option value=12>12</option>
+		  <option value=13>13</option>
+		  <option value=14>14</option>
+		  <option value=15>15</option>
+		</select> x 
+		<select id="rows">
+		  <option value=7>7</option>
+		  <option value=8>8</option>
+		  <option value=9 selected>9</option>
+		  <option value=10>10</option>
+		  <option value=11>11</option>
+		  <option value=12>12</option>
+		  <option value=13>13</option>
+		  <option value=14>14</option>
+		  <option value=15>15</option>
+		</select>
+	  </div>
+	</center>
+	<script src="js\scripts.js"></script>
+	<span style="position:absolute;left:0px;bottom:0px;color:white;font-size:13pt;">S.E.F.F.I.A.R 0.0.1</span>
+	<span style="position:absolute;right:0px;bottom:0px;color:white;font-size:13pt;">Hood 2017</span>
+	</body>
+</html>		
