@@ -82,6 +82,7 @@ function drop(b,c,p,anim){
 		a.push(r);
 		r++;}
 	//alert("Dropped in row "+r-1);
+	if(!valid(b,c))alert("Error! Attempted to drop in invalid column");
 	b[r-1][c] = p;
 	if(anim){
 		blinkers=[];
@@ -98,7 +99,7 @@ function drop(b,c,p,anim){
 		}
 	
 	}
-	}catch(e){alert("Drop error:\n"+e+" cp(r) "+ c + " "+p+"("+r-1+")");}
+	}catch(e){alert("Drop error:\n"+e+" cp(r) "+ c + " "+p+"("+(r-1)+")");}
 }
 function dr2(a,i,c,p){
 	try{
