@@ -65,8 +65,10 @@ window.onload = function(){
 		hml+="</tr>";
 	}
 	grid.innerHTML=hml;
-	menuOn();
 	setInterval(blink,250);
+	if(!(localStorage.lookAhead == "tut"))menuOn();
+	else playTut();
+	
 	},200);
 };
 function drop(b,c,p,anim){
@@ -111,6 +113,8 @@ function full(b){
 	return true;
 }
 function playComputer(){
+	blinkers = [];
+	blink();
 	if(localStorage.lookAhead == "tut"){
 		playTut();
 		return;
@@ -481,6 +485,8 @@ function menuOff(){
 }
 function playMulti(){
 	gameOver = false;
+	blinkers = [];
+	blink();
 	//alert(g("difficulty").value);
 	h=localStorage.h;
 	w=localStorage.w;
@@ -610,7 +616,7 @@ function playT(col){
 		//render();
 		won = vict(board,col);//check if player has won
 		if(won){
-			show("Player wins!");
+			show("Well done! Change the difficulty to easy or hard in the menu.");
 			return;
 	}
 	else if(full(board)){
@@ -626,7 +632,7 @@ function playT(col){
 	won = vict(board,best);//check if ai has won
 	
 		if(won){
-			show("S.E.F.F.I.A.R wins!");
+			show("Please retry the tutorial, go to menu and touch single player game");
 			return;
 		}
 		else if(full(board)){
