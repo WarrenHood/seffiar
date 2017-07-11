@@ -2,8 +2,8 @@
     <widget xmlns   = ""
         xmlns:gap   = ""
         id          = "com.warren.seffiar"
-        versionCode = "003" 
-        version     = "0.0.3" >
+        versionCode = "004" 
+        version     = "0.0.4" >
 
     <!-- versionCode is optional and Android only -->
 

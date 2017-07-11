@@ -84,6 +84,8 @@ function drop(b,c,p,anim){
 	//alert("Dropped in row "+r-1);
 	b[r-1][c] = p;
 	if(anim){
+		blinkers=[];
+		blink();
 		exclx = c;
 		excly = r-1;
 		dr2(a,0,c,p);
@@ -602,6 +604,8 @@ function playTut(){
 		var best = getWorst(board,"o",2);
 	drop(board,best,"o",true);
 	//render();
+	blinkers = [];
+	blink();
 	won = vict(board,best);//check if player has won
 	
 		if(won){
@@ -623,10 +627,10 @@ function playTut(){
 function playT(col){
 	currentPlayer=="x" && valid(board,col)
 	?function(){
-		blinkers = [];
-		blink();
 		currentPlayer = "o";
 		drop(board,col,"x",true);
+		blinkers = [];
+		blink();
 		//render();
 		won = vict(board,col);//check if player has won
 		if(won){
@@ -642,6 +646,8 @@ function playT(col){
 	setTimeout(function(){
 	var best = getWorst(board,"o",2);
 	drop(board,best,"o",true);
+	blinkers = [];
+	blink();
 	//render();
 	won = vict(board,best);//check if ai has won
 	
