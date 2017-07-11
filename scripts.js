@@ -22,6 +22,7 @@ function handleSplash(){
 }
 //alert("script");
 window.onload = function(){
+	setTimeout(function(){
 	//handleSplash();
 	animating = "up";
 	winw = window.innerWidth;
@@ -71,6 +72,7 @@ window.onload = function(){
 	}
 	grid.innerHTML=hml;
 	menuOn()();
+	},200);
 };
 function drop(b,c,p,anim){
 	//alert("dropping");
@@ -388,9 +390,12 @@ function menuOn(){
 	document.getElementsByName("fp")[1].checked = true;
 	g("rows").getElementsByTagName("option")[localStorage.h-7].selected=true;
 	g("cols").getElementsByTagName("option")[localStorage.w-7].selected=true;
-	var dist = winh*(1-0.065)-5;;
-	var vel = 10;
-	var acc = 10;
+	var dist = winh*(1-0.065)-3;
+	var vel = -0.5 + Math.sqrt(0.5*0.5 +2*winh)*1.1;
+	var acc = 1;
+	var minv = 1;
+	var duration = 800;
+	var inter = duration/vel;
 	var thisInt= setInterval(
 	function(){
 		if(animating == "down"){
@@ -415,16 +420,17 @@ function menuOn(){
 			//menu.style.top = winh - parseInt(mtog.style.bottom)+"px";
 			menu.style.height = parseInt(mtog.style.bottom)-2+"px";
 		}
-		vel += acc;
+		vel -= acc;
+		vel = max(minv,vel);
 	}
-	,1000/24);
+	,inter);
 	}catch(e){
 		alert(e);
 	}
 }
 function menuOff(){
 	try{
-	var vel = 10;
+	var vel = 0;//0.5*winh*0.935*(winh*0.935+1);
 	var acc = 10;
 	var thisInt= setInterval(
 	function(){
