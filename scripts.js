@@ -4,6 +4,8 @@ localStorage.firstP = localStorage.firstP || "pink";
 localStorage.w= localStorage.w || 7;
 localStorage.h = localStorage.h || 9;
 blinkers = [];
+exclx = null;
+excly = null;
 function g(x){
 	return document.getElementById(x);
 }
@@ -56,7 +58,7 @@ window.onload = function(){
 			r.push('.');
 			hml+="<td class='col' style='height:"+wid;
 			hml+="width:"+wid;
-			hml+="border:1px solid green;";
+			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
 			hml+="' onclick='play("+j+");' ";
 			hml +="></td>";
@@ -81,7 +83,19 @@ function drop(b,c,p,anim){
 		r++;}
 	//alert("Dropped in row "+r-1);
 	b[r-1][c] = p;
-	if(anim)dr2(a,0,c,p);
+	if(anim){
+		exclx = c;
+		excly = r-1;
+		dr2(a,0,c,p);
+		var rows = document.getElementsByClassName("row");
+		for(var ro=0;ro<board.length;ro++){
+			row = rows[ro].getElementsByTagName("td");
+			for(var col=0;col<row.length;col++){
+				row[col].style.border = ro==r-1&&col==c?"3px solid red":row[col].style.border;
+			}
+		}
+	
+	}
 	}catch(e){alert("Drop error:\n"+e+" cp "+ c + " "+p);}
 }
 function dr2(a,i,c,p){
@@ -134,7 +148,7 @@ function playComputer(){
 			r.push('.');
 			hml+="<td class='col' style='height:"+wid;
 			hml+="width:"+wid;
-			hml+="border:1px solid green;";
+			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
 			hml+="' onclick='play("+j+");' ";
 			hml +="></td>";
@@ -502,7 +516,7 @@ function playMulti(){
 			r.push('.');
 			hml+="<td class='col' style='height:"+wid;
 			hml+="width:"+wid;
-			hml+="border:1px solid green;";
+			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
 			hml+="' onclick='play2("+j+");' ";
 			hml +="></td>";
@@ -565,7 +579,7 @@ function playTut(){
 			r.push('.');
 			hml+="<td class='col' style='height:"+wid;
 			hml+="width:"+wid;
-			hml+="border:1px solid green;";
+			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
 			hml+="' onclick='playT("+j+");' ";
 			hml +="></td>";
@@ -655,12 +669,13 @@ function blink(){
 	for(var r=0;r<board.length;r++){
 		row = rows[r].getElementsByTagName("td");
 		for(var c=0;c<row.length;c++){
+			if(r*1==excly*1&&c*1==exclx*1)continue;
 			var doit = false;
 			for(var bli=0;bli<blinkers.length;bli++)if(blinkers[bli]*1==c*1){
 				doit = true;
 				break;
 			}
-			row[c].style.border = (row[c].style.border=="1px solid green" && doit)?"1px solid red":"1px solid green";
+			row[c].style.border = (row[c].style.border=="3px solid green" && doit)?"3px solid red":"3px solid green";
 			}
 	}
 	}catch(e){alert("Blink error:\n"+e);}
