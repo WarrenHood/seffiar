@@ -1,13 +1,9 @@
-lookAhead = localStorage.lookAhead || 3;
+lookAhead = localStorage.lookAhead || "tut";
 localStorage.lookAhead = lookAhead;
-if(lookAhead == 4){
-	localStorage.lookAhead = 3;
-	lookAhead = 3;
-}
 localStorage.firstP = localStorage.firstP || "pink";
 localStorage.w= localStorage.w || 7;
 localStorage.h = localStorage.h || 9;
-
+blinkers = [];
 function g(x){
 	return document.getElementById(x);
 }
@@ -45,9 +41,7 @@ window.onload = function(){
 	//alert(sum([1,2,3,4]));
 	mtog.onclick = menuOn;
 	grid = g("grid");
-	g("info").onclick = function(){
-		
-	};
+	g("info").onclick = function(){};
 	h = 9;
 	w = 7;
 	var hml = "";
@@ -71,12 +65,13 @@ window.onload = function(){
 		hml+="</tr>";
 	}
 	grid.innerHTML=hml;
-	menuOn()();
+	menuOn();
+	setInterval(blink,250);
 	},200);
 };
 function drop(b,c,p,anim){
 	//alert("dropping");
-	if(anim)a=[];
+	a=[];
 	try{
 	var r = 0;
 	while(r < b.length && b[r][c] == '.'){
@@ -116,6 +111,10 @@ function full(b){
 	return true;
 }
 function playComputer(){
+	if(localStorage.lookAhead == "tut"){
+		playTut();
+		return;
+	}
 	//alert(g("difficulty").value);
 	h=9;
 	w=7;
@@ -210,14 +209,25 @@ function color(p){
 	//alert(p);
 	return p=="x"?"rgba(300,100,800,0.8)":p=="o"?"black":"rgba(150,100,800,0.8)";
 }
-function getBest(b){
-	var ok= bmovs(b,"o",localStorage.lookAhead );
+function getBest(b,cpl,lka,getArr){
+	var ok= bmovs(b,cpl||"o",lka||localStorage.lookAhead );
 	//alert(ok);
 	var highest = ok[0]*1;
 	//alert(highest);
 	for(var i=0;i<ok.length;i++)if(ok[i]>highest && valid(b,i))highest = ok[i]*1;
 	var best = [];
 	for(var i=0;i<ok.length;i++)if(ok[i]*1==highest*1 && valid(b,i))best.push(i);
+	return getArr?best:best[Math.floor(Math.random()*best.length)];
+	
+}
+function getWorst(b,cpl,lka){
+	var ok= bmovs(b,cpl||"o",lka||localStorage.lookAhead );
+	//alert(ok);
+	var lowest = ok[0]*1;
+	//alert(highest);
+	for(var i=0;i<ok.length;i++)if(ok[i]<lowest && valid(b,i))lowest = ok[i]*1;
+	var best = [];
+	for(var i=0;i<ok.length;i++)if(ok[i]*1==lowest*1 && valid(b,i))best.push(i);
 	return best[Math.floor(Math.random()*best.length)];
 	
 }
@@ -384,7 +394,7 @@ function menuOn(){
 	menu.innerHTML = menuhtm;
 	localStorage.lookAhead==2?g("easy").selected=true:
 	localStorage.lookAhead==3?g("normal").selected=true:
-	g("hard").selected=true;
+	g("tut").selected=true;
 	localStorage.firstP=="pink"?
 	document.getElementsByName("fp")[0].checked = true:
 	document.getElementsByName("fp")[1].checked = true;
@@ -532,4 +542,121 @@ function play2(col){
 	catch(e){
 		alert(e);
 	}
+}
+function playTut(){
+	//alert(g("difficulty").value);
+	h=9;
+	w=7;
+	var hml = "";
+	board = [];
+	var wid = (window.innerWidth/w)*0.85+"px;";
+	grid.style.height = wid*w+"px";
+	grid.style.width = wid*w +"px";
+	for(var i=0;i<h;i++){
+		var r =[];
+		hml+="<tr class='row'>";
+		for(var j=0;j<w;j++){
+			r.push('.');
+			hml+="<td class='col' style='height:"+wid;
+			hml+="width:"+wid;
+			hml+="border:1px solid green;";
+			hml+="border-radius:100%;";
+			hml+="' onclick='playT("+j+");' ";
+			hml +="></td>";
+		}
+		board.push(r);
+		hml+="</tr>";
+	}
+	grid.innerHTML=hml;
+	currentPlayer = 'o';
+	if(localStorage.firstP == "pink" )currentPlayer = "x";
+	if(currentPlayer == "x"){
+		show("Touch a column to drop a disc, try getting four in a row.");
+		blinkers = getBest(board,"x",2,true);
+		blink();
+		//alert("You are starting");
+	}
+	else{
+		show("S.E.F.F.I.A.R is thinking...");
+		setTimeout(function(){
+		var best = getWorst(board,"o",2);
+	drop(board,best,"o",true);
+	//render();
+	won = vict(board,best);//check if player has won
+	
+		if(won){
+			alert("S.E.F.F.I.A.R wins!");
+			return;
+		}
+		else if(full(board)){
+		alert("It's a draw");
+		return;
+	}
+	// make computer play
+	show("Touch a column to drop a disc, try getting four in a row.");
+	blinkers = getBest(board,"x",2,true);
+	blink();
+	currentPlayer = "x";
+	},500);
+	}
+}
+function playT(col){
+	currentPlayer=="x" && valid(board,col)
+	?function(){
+		blinkers = [];
+		blink();
+		currentPlayer = "o";
+		drop(board,col,"x",true);
+		//render();
+		won = vict(board,col);//check if player has won
+		if(won){
+			show("Player wins!");
+			return;
+	}
+	else if(full(board)){
+		show("It's a draw!");
+		return;
+	}
+	show("S.E.F.F.I.A.R is thinking...");
+	//alert("ai");
+	setTimeout(function(){
+	var best = getWorst(board,"o",2);
+	drop(board,best,"o",true);
+	//render();
+	won = vict(board,best);//check if ai has won
+	
+		if(won){
+			show("S.E.F.F.I.A.R wins!");
+			return;
+		}
+		else if(full(board)){
+		show("It's a draw!");
+		return;
+	}
+	show("Touch a column to drop a disc, try getting four in a row.");
+	// make computer play
+	currentPlayer = "x";
+	blinkers = getBest(board,"x",2,true);
+	blink();
+	},1000);
+	}()
+	:function(){};
+}
+function blink(){
+	//alert("blinking");
+	try{
+	var rows = document.getElementsByClassName("row");
+	for(var r=0;r<board.length;r++){
+		row = rows[r].getElementsByTagName("td");
+		for(var c=0;c<row.length;c++){
+			var doit = false;
+			for(var bli=0;bli<blinkers.length;bli++)if(blinkers[bli]*1==c*1){
+				doit = true;
+				break;
+			}
+			row[c].style.border = (row[c].style.border=="1px solid green" && doit)?"1px solid red":"1px solid green";
+			}
+	}
+	}catch(e){alert("Blink error:\n"+e);}
+	
 }
