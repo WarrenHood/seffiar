@@ -98,7 +98,7 @@ function drop(b,c,p,anim){
 		}
 	
 	}
-	}catch(e){alert("Drop error:\n"+e+" cp "+ c + " "+p);}
+	}catch(e){alert("Drop error:\n"+e+" cp(r) "+ c + " "+p+"("+r-1+")");}
 }
 function dr2(a,i,c,p){
 	try{
