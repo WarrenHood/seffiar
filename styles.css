@@ -19,7 +19,7 @@ overflow:hidden;
     padding: 0;
     margin: 0;
     background:rgba(150,100,800,0.8);
-    font-size: 20pt;
+    font-size: 20px;
 }
 #front{
   -webkit-transform: translateZ(250px) rotateY(45deg);
@@ -54,7 +54,7 @@ overflow:hidden;
 }
 
 select{
-  font-size:50pt;
+  font-size:14pt;
   background:PapayaWhip;
   color:BlueViolet;
   border:1px solid red;
@@ -68,9 +68,9 @@ select{
   text-align:center;
   vertical-align:50%;
   color:BlanchedAlmond;
-  font-size:30pt;
-  border-top-right-radius:50px;
-  border-top-left-radius:50px;
+  font-size:30px;
+  border-top-right-radius:10px;
+  border-top-left-radius:10px;
   border:3px solid WhiteSmoke;
   border-bottom: none;
 }
