@@ -48,7 +48,7 @@ window.onload = function(){
 	w = 7;
 	var hml = "";
 	board = [];
-	var wid = (window.innerWidth/w)*0.85+"px;";
+	var wid = (window.innerWidth/w)*0.85-4+"px;";
 	grid.style.height = wid*w+"px";
 	grid.style.width = wid*w +"px";
 	for(var i=0;i<h;i++){
@@ -138,7 +138,7 @@ function playComputer(){
 	w=7;
 	var hml = "";
 	board = [];
-	var wid = (window.innerWidth/w)*0.85+"px;";
+	var wid = (window.innerWidth/w)*0.85-4+"px;";
 	grid.style.height = wid*w+"px";
 	grid.style.width = wid*w +"px";
 	for(var i=0;i<h;i++){
@@ -506,7 +506,7 @@ function playMulti(){
 	w=localStorage.w;
 	var hml = "";
 	board = [];
-	var wid = (window.innerWidth/w)*0.85+"px;";
+	var wid = (window.innerWidth/w)*0.85-4+"px;";
 	grid.style.height = wid*w+"px";
 	grid.style.width = wid*w +"px";
 	for(var i=0;i<h;i++){
@@ -569,7 +569,7 @@ function playTut(){
 	w=7;
 	var hml = "";
 	board = [];
-	var wid = (window.innerWidth/w)*0.85+"px;";
+	var wid = (window.innerWidth/w)*0.85-4+"px;";
 	grid.style.height = wid*w+"px";
 	grid.style.width = wid*w +"px";
 	for(var i=0;i<h;i++){
