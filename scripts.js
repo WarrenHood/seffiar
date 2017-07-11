@@ -99,7 +99,7 @@ function drop(b,c,p,anim){
 		}
 	
 	}
-	}catch(e){alert("Drop error:\n"+e+" cp(r) "+ c + " "+p+"("+(r-1)+")");}
+	}catch(e){alert("Drop error:\n"+e+" cp(r)/anim "+ c + " "+p+"("+(r-1)+")/"+anim);}
 }
 function dr2(a,i,c,p){
 	try{
@@ -233,18 +233,20 @@ function color(p){
 function getBest(b,cpl,lka,getArr){
 	var ok= bmovs(b,cpl||"o",lka||localStorage.lookAhead );
 	//alert(ok);
-	var highest = ok[0]*1;
+	//alert("Potentials:\n"+ok);
+	var highest = -100000000;
 	//alert(highest);
 	for(var i=0;i<ok.length;i++)if(ok[i]>highest && valid(b,i))highest = ok[i]*1;
 	var best = [];
 	for(var i=0;i<ok.length;i++)if(ok[i]*1==highest*1 && valid(b,i))best.push(i);
+	//alert("Best:\n"+best);
 	return getArr?best:best[Math.floor(Math.random()*best.length)];
 	
 }
 function getWorst(b,cpl,lka){
 	var ok= bmovs(b,cpl||"o",lka||localStorage.lookAhead );
 	//alert(ok);
-	var lowest = ok[0]*1;
+	var lowest = 1000000000;
 	//alert(highest);
 	for(var i=0;i<ok.length;i++)if(ok[i]<lowest && valid(b,i))lowest = ok[i]*1;
 	var best = [];
