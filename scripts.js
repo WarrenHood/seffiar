@@ -3,9 +3,10 @@ localStorage.lookAhead = lookAhead;
 localStorage.firstP = localStorage.firstP || "pink";
 localStorage.w= localStorage.w || 7;
 localStorage.h = localStorage.h || 9;
+localStorage.anti = localStorage.anti || false;
 blinkers = [];
-exclx = null;
-excly = null;
+exclx = -1;
+excly = -1;
 function g(x){
 	return document.getElementById(x);
 }
@@ -169,13 +170,13 @@ function playComputer(){
 	else{
 		show("S.E.F.F.I.A.R is thinking...");
 		setTimeout(function(){
-		var best = getBest(board);
+		var best = eval(localStorage.anti)?getWorst(board):getBest(board);
 	drop(board,best,"o",true);
 	//render();
 	won = vict(board,best);//check if player has won
 	
 		if(won){
-			alert("S.E.F.F.I.A.R wins!");
+			alert(eval(localStorage.anti)?"Player wins!":"S.E.F.F.I.A.R wins!");
 			return;
 		}
 		else if(full(board)){
@@ -196,7 +197,7 @@ function play(col){
 		//render();
 		won = vict(board,col);//check if player has won
 		if(won){
-			show("Player wins!");
+			show(eval(localStorage.anti)?"S.E.F.F.I.A.R wins!":"Player wins!");
 			return;
 	}
 	else if(full(board)){
@@ -206,13 +207,13 @@ function play(col){
 	show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
 	setTimeout(function(){
-	var best = getBest(board);
+	var best = eval(localStorage.anti)?getWorst(board):getBest(board);
 	drop(board,best,"o",true);
 	//render();
 	won = vict(board,best);//check if ai has won
 	
 		if(won){
-			show("S.E.F.F.I.A.R wins!");
+			show(eval(localStorage.anti)?"Player wins!":"S.E.F.F.I.A.R wins!");
 			return;
 		}
 		else if(full(board)){
@@ -423,6 +424,7 @@ function menuOn(){
 	document.getElementsByName("fp")[1].checked = true;
 	g("rows").getElementsByTagName("option")[localStorage.h-7].selected=true;
 	g("cols").getElementsByTagName("option")[localStorage.w-7].selected=true;
+	g("anti").checked = eval(localStorage.anti);
 	var dist = winh*(1-0.065)-3;
 	var vel = -0.5 + Math.sqrt(0.5*0.5 +2*winh)*1.1;
 	var acc = 1;
@@ -488,6 +490,7 @@ function menuOff(){
 			localStorage.firstP = document.getElementsByName("fp")[0].checked?"pink":"black";
 			localStorage.w = g("cols").value;
 			localStorage.h = g("rows").value;
+			localStorage.anti = g("anti").checked;
 			menu.style.display="none";
 			menuhtm = menu.innerHTML;
 			menu.innerHTML = "";
@@ -548,7 +551,7 @@ function play2(col){
 		//render();
 		won = vict(board,col);//check if player has won
 		if(won){
-			show((currentPlayer=="x"?"pink":"black")+" wins!");
+			show((currentPlayer=="x"&&eval(localStorage.anti)?"Black":(eval(localStorage.anti)&&currentPlayer=="o"?"Pink":currentPlayer=="o"?"Black":"Pink"))+" wins!");
 			currentPlayer == ".";
 			gameOver = true;
 			return;
@@ -569,6 +572,8 @@ function play2(col){
 	}
 }
 function playTut(){
+	exclx = -1;
+	excly = -1;
 	//alert(g("difficulty").value);
 	h=9;
 	w=7;

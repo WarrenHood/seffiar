@@ -83,4 +83,5 @@ select{
 }
 #menu h1{
   border-bottom: 1px solid white;
+  overflow:auto;
 }
