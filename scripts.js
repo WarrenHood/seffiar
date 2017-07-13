@@ -11,6 +11,21 @@ excly = -1;
 function g(x){
 	return document.getElementById(x);
 }
+function good(r,c){
+	var cp = ""+board[r][c];
+	if(r>0){
+		if(board[r-1][c]+""==cp)return true;
+	}
+	if(c>0){
+		if(board[r][c-1]+""==cp)return true;
+	}
+	if(r+1<board.length){
+		if(board[r+1][c]+""==cp)return true;
+	}
+	if(c+1<board[0].length){
+		if(board[r][c+1]+""==cp)return true;
+	}
+}
 function handleSplash(){
 	var t = g("title");
 	var size = 100;
@@ -138,7 +153,7 @@ function compSto(r,c){
 	var dat = new Date();
 	var delta = dat.getTime() - tim;
 	if(delta<300)play(c);
-	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]],function(){
+	else if(board[r][c] == ""+currentPlayer && good(r,c))sacrifice([[r,c]],function(){
 		if(gameOver)return;
 		show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
