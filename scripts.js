@@ -106,11 +106,11 @@ function dr2(a,i,c,p){
 	try{
 	var rows = document.getElementsByClassName("row");
 	
-	if(i > 0)rows[i-1].getElementsByTagName("td")[c].style.backgroundColor = color(".");
+	if(i > 0)rows[i-1].getElementsByTagName("td")[c].style.backgroundColor = color(board[i-1][c]);
 	rows[i].getElementsByTagName("td")[c].style.backgroundColor = color(p);
 	
 	if(i+1<a.length)setTimeout(function(){dr2(a,i+1,c,p);},100);
-	else render();
+	//else render();
 	}catch(e){
 		alert("Drop anim error:\n"+e);
 	}
