@@ -110,6 +110,7 @@ function dr2(a,i,c,p){
 	rows[i].getElementsByTagName("td")[c].style.backgroundColor = color(p);
 	
 	if(i+1<a.length)setTimeout(function(){dr2(a,i+1,c,p);},100);
+	else render();
 	}catch(e){
 		alert("Drop anim error:\n"+e);
 	}
