@@ -678,7 +678,7 @@ function playTut(){
 	// make computer play
 	show("Touch a column to drop a disc, try getting four in a row.");
 	blinkers = getBest(board,"x",2,true);
-	alert(blinkers);
+	//alert(blinkers);
 	blink();
 	currentPlayer = "x";
 	},500);
@@ -723,7 +723,7 @@ function playT(col){
 	// make computer play
 	currentPlayer = "x";
 	blinkers = getBest(board,"x",2,true);
-	alert(blinkers);
+	//alert(blinkers);
 	blink();
 	},1000);
 	}()
