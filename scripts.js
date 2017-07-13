@@ -5,6 +5,7 @@ localStorage.w= localStorage.w || 7;
 localStorage.h = localStorage.h || 9;
 localStorage.anti = localStorage.anti || false;
 blinkers = [];
+yblinkers =[];
 exclx = -1;
 excly = -1;
 function g(x){
@@ -42,9 +43,9 @@ window.onload = function(){
 	menuhtm = menu.innerHTML;
 	//alert("ready");
 	//alert(sum([1,2,3,4]));
-	mtog.onclick = menuOn;
+	mtog.ontouchstart = menuOn;
 	grid = g("grid");
-	g("info").onclick = function(){};
+	g("info").ontouchstart= function(){};
 	h = 9;
 	w = 7;
 	var hml = "";
@@ -61,7 +62,7 @@ window.onload = function(){
 			hml+="width:"+wid;
 			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
-			hml+="' onclick='play("+j+");' ";
+			hml+="' ontouchstart='play("+j+");' ";
 			hml +="></td>";
 		}
 		board.push(r);
@@ -69,6 +70,7 @@ window.onload = function(){
 	}
 	grid.innerHTML=hml;
 	setInterval(blink,250);
+	setInterval(yblink,70);
 	if(!(localStorage.lookAhead == "tut"))menuOn();
 	else playTut();
 	
@@ -131,8 +133,42 @@ function full(b){
 	for(var c=0;c<b[0].length;c++)if(b[0][c] == ".")return false;
 	return true;
 }
+function compSto(r,c){
+	try{
+	var dat = new Date();
+	var delta = dat.getTime() - tim;
+	if(delta<300)play(c);
+	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]],function(){
+		if(gameOver)return;
+		show("S.E.F.F.I.A.R is thinking...");
+	//alert("ai");
+	setTimeout(function(){
+	var best = eval(localStorage.anti)?getWorst(board):getBest(board);
+	drop(board,best,"o",true);
+	//render();
+	won = vict(board,best);//check if ai has won
+	
+		if(won){
+			show(eval(localStorage.anti)?"Player wins!":"S.E.F.F.I.A.R wins!");
+			return;
+		}
+		else if(full(board)){
+		show("It's a draw!");
+		return;
+	}
+	show("Your Turn. (Long touch existing discs to sacrifice)");
+	// make computer play
+	currentPlayer = "x";
+	},1000);
+		
+	});
+	}catch(e){
+		alert(e);
+	}
+}
 function playComputer(){
 	blinkers = [];
+	gameOver=false;
 	blink();
 	if(localStorage.lookAhead == "tut"){
 		playTut();
@@ -155,7 +191,7 @@ function playComputer(){
 			hml+="width:"+wid;
 			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
-			hml+="' onclick='play("+j+");' ";
+			hml+="' ontouchstart='touchBeg("+i+","+j+");' ontouchend='compSto("+i+","+j+");'";
 			hml +="></td>";
 		}
 		board.push(r);
@@ -165,7 +201,7 @@ function playComputer(){
 	currentPlayer = 'o';
 	if(localStorage.firstP == "pink" )currentPlayer = "x";
 	if(currentPlayer == "x"){
-		show("Your Turn");
+		show("Your Turn. (Long touch existing discs to sacrifice)");
 		//alert("You are starting");
 	}
 	else{
@@ -185,7 +221,7 @@ function playComputer(){
 		return;
 	}
 	// make computer play
-	show("Your Turn");
+	show("Your Turn. (Long touch existing discs to sacrifice)");
 	currentPlayer = "x";
 	},500);
 	}
@@ -221,7 +257,7 @@ function play(col){
 		show("It's a draw!");
 		return;
 	}
-	show("Your Turn");
+	show("Your Turn. (Long touch existing discs to sacrifice)");
 	// make computer play
 	currentPlayer = "x";
 	},1000);
@@ -256,11 +292,13 @@ function getWorst(b,cpl,lka){
 	return best[Math.floor(Math.random()*best.length)];
 	
 }
-function vict(b,x){
+function vict(b,x,y){
 	try{
+	if(!y){
 	y = 0;
 	while ( y < b.length && b[y][x] == '.')y++;
-	y=min(b.length,y);
+	y=min(b.length-1,y);}
+	//if(board[y][x] == ".")return;
 	c = x*1;
 	r = y*1;
 	//horiz
@@ -506,6 +544,18 @@ function menuOff(){
 		alert(e);
 	}
 }
+function touchBeg(r,c){
+	var dat = new Date();
+	tim = dat.getTime();
+	//alert(c);
+}
+function touchSto(r,c){
+	var dat = new Date();
+	var delta = dat.getTime() - tim;
+	if(delta<300)play2(c);
+	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]]);
+	
+}
 function playMulti(){
 	gameOver = false;
 	blinkers = [];
@@ -527,7 +577,7 @@ function playMulti(){
 			hml+="width:"+wid;
 			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
-			hml+="' onclick='play2("+j+");' ";
+			hml+="' ontouchstart='touchBeg("+i+","+j+");' ontouchend='touchSto("+i+","+j+");'";
 			hml +="></td>";
 		}
 		board.push(r);
@@ -537,13 +587,13 @@ function playMulti(){
 	currentPlayer = 'o';
 	if(localStorage.firstP == "pink" )currentPlayer = "x";
 	if(currentPlayer == "x"){
-		show("Pink's Turn");
+		show("Pink's turn (Long touch existing discs to sacrifice)");
 		//alert("You are starting");
 	}
-	else show("Black's Turn");
+	else show("Black's turn (Long touch existing discs to sacrifice)");
 }
 function play2(col){
-	if(currentPlayer == ".")return;
+	if(gameOver || currentPlayer == ".")return;
 	//alert(col);
 	try{
 	if(valid(board,col) && !gameOver){
@@ -592,7 +642,7 @@ function playTut(){
 			hml+="width:"+wid;
 			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
-			hml+="' onclick='playT("+j+");' ";
+			hml+="' ontouchstart='playT("+j+");' ";
 			hml +="></td>";
 		}
 		board.push(r);
@@ -628,6 +678,7 @@ function playTut(){
 	// make computer play
 	show("Touch a column to drop a disc, try getting four in a row.");
 	blinkers = getBest(board,"x",2,true);
+	alert(blinkers);
 	blink();
 	currentPlayer = "x";
 	},500);
@@ -672,6 +723,7 @@ function playT(col){
 	// make computer play
 	currentPlayer = "x";
 	blinkers = getBest(board,"x",2,true);
+	alert(blinkers);
 	blink();
 	},1000);
 	}()
@@ -695,4 +747,150 @@ function blink(){
 	}
 	}catch(e){alert("Blink error:\n"+e);}
 	
+}
+function desHas(d,r,c){
+	for(var i=0;i<d.length;i++){
+		if((d[i][0]-r == 0) && (d[i][1]-c == 0))return true;
+	}
+}
+function compb(p,r,c){
+	return ""+board[p[0]][p[1]] == ""+board[r][c];
+}
+function fullcheck(f){
+	if(full(board)){
+		show("It's a draw!");
+		gameOver = true;
+		}
+	for(var r=0;r<board.length;r++){
+		for(var c=0;c<board[0].length;c++){
+			if(board[r][c] == ".")continue;
+			if(vict(board,c,r)){
+				gameOver = true;
+				
+				f?show(board[r][c]=="x"?"Player wins!":"S.E.F.F.I.A.R wins!"):show(board[r][c]=="x"?"Pink wins!":"Black wins!");
+			}
+		}
+	}
+}
+function sacrifice(sacs,f){
+	if(gameOver)return;
+	if(sacs.length == 0){
+		//alert("sacs done");
+		
+	}
+	var destroy = [];
+	for(var i=0;i<sacs.length;i++){
+		var pos = sacs[i];
+		
+		if(board[pos[0]][pos[1]]==".")continue;
+		if(pos[0] > 0 && compb(pos,pos[0]-1,pos[1])){if(!desHas(destroy,pos[0]-1,pos[1]))destroy.push([pos[0]-1,pos[1]]);
+		if(pos[0] > 1 && compb(pos,pos[0]-2,pos[1])){if(!desHas(destroy,pos[0]-2,pos[1]))destroy.push([pos[0]-2,pos[1]]);
+		if(pos[0] > 2 && compb(pos,pos[0]-3,pos[1]))if(!desHas(destroy,pos[0]-3,pos[1]))destroy.push([pos[0]-3,pos[1]]);}
+		if(!desHas(destroy,pos[0],pos[1]))destroy.push(pos);
+		}
+		
+		if(pos[0]+1 < board.length && compb(pos,pos[0]+1,pos[1])){if(!desHas(destroy,pos[0]+1,pos[1]))destroy.push([pos[0]+1,pos[1]]);
+		if(pos[0]+2 < board.length && compb(pos,pos[0]+2,pos[1])){if(!desHas(destroy,pos[0]+2,pos[1]))destroy.push([pos[0]+2,pos[1]]);
+		if(pos[0]+3 < board.length && compb(pos,pos[0]+3,pos[1]))if(!desHas(destroy,pos[0]+3,pos[1]))destroy.push([pos[0]+3,pos[1]]);}
+		if(!desHas(destroy,pos[0],pos[1]))destroy.push(pos);
+		}
+		
+		if(pos[1]+1 < board[0].length && compb(pos,pos[0],pos[1]+1)){if(!desHas(destroy,pos[0],pos[1]+1))destroy.push([pos[0],pos[1]+1]);
+		if(pos[1]+2 < board[0].length && compb(pos,pos[0],pos[1]+2)){if(!desHas(destroy,pos[0],pos[1]+2))destroy.push([pos[0],pos[1]+2]);
+		if(pos[1]+3 < board[0].length && compb(pos,pos[0],pos[1]+3))if(!desHas(destroy,pos[0],pos[1]+3))destroy.push([pos[0],pos[1]+3]);}
+		if(!desHas(destroy,pos[0],pos[1]))destroy.push(pos);
+		}
+		
+		if(pos[1]-1 >= 0 && compb(pos,pos[0],pos[1]-1)){if(!desHas(destroy,pos[0],pos[1]-1))destroy.push([pos[0],pos[1]-1]);
+		if(pos[1]-2 >= 0 && compb(pos,pos[0],pos[1]-2)){if(!desHas(destroy,pos[0],pos[1]-2))destroy.push([pos[0],pos[1]-2]);
+		if(pos[1]-3 >= 0 && compb(pos,pos[0],pos[1]-3))if(!desHas(destroy,pos[0],pos[1]-3))destroy.push([pos[0],pos[1]-3]);}
+		if(!desHas(destroy,pos[0],pos[1]))destroy.push(pos);
+		}
+		
+	}
+	if(destroy.length == 0){
+		fullcheck(f);
+		if(gameOver)return;
+		currentPlayer = currentPlayer=="x"?"o":'x';
+		show(currentPlayer=="x"?show("Pink's turn (Long touch existing discs to sacrifice)"):"Black's turn (Long touch existing discs to sacrifice)");
+		if(f){
+			f();
+		}
+		return;
+	}
+	exclx = null;
+	excly = null;
+	yblinkers = destroy;
+	setTimeout(
+	function(){
+		for(var d=0;d<destroy.length;d++)board[destroy[d][0]][destroy[d][1]] = ".";
+		render();
+		yblinkers = [];
+		var bottoms= [];
+		for(var col=0;col<board[0].length;col++){
+			for(var row=board.length-1;row>=0;row--){
+				if(board[row][col] == "."){
+					bottoms.push(row);
+					break;
+				}
+				else if(row == 0)bottoms.push(-1);
+			}
+		}
+		setTimeout( function(){fall(bottoms,f);},500);;
+	}
+	,1000);
+}
+function fall(bottoms,f){
+	try{
+	//alert("falling");
+	var hasDropped = false;
+	for(var col=0;col<board[0].length;col++){
+		if(bottoms[col]==-1 || board[bottoms[col]][col] != ".")continue;
+		//hasDropped = true;
+		for(var row = bottoms[col];row>0;row--){
+			board[row][col] = ""+board[row-1][col];
+			if(board[row][col] != ".")hasDropped = true;
+			board[row-1][col] = ".";
+		}
+	}
+	render();
+	if(hasDropped){setTimeout(function(){
+		fall(bottoms,f);
+	},500);
+	}
+	else{
+		var toDestroy = [];
+		for(var c=0;c<board[0].length;c++){
+			for(var r=bottoms[c];r>=0;r--){
+				if(board[r][c] != ".")toDestroy.push([r,c]);
+			}
+		}
+		//alert("sac "+toDestroy);
+		sacrifice(toDestroy,f);
+	}
+	}catch(e){
+		alert("fall error:\n"+e);
+	}
+}
+function yblink(){
+	//alert("blinking");
+	try{
+	var rows = document.getElementsByClassName("row");
+	for(var yr=0;yr<yblinkers.length;yr++){
+		var row = rows[yblinkers[yr][0]].getElementsByTagName("td");
+		row[yblinkers[yr][1]].style.border = row[yblinkers[yr][1]].style.border=="3px solid orange"?"3px solid green":"3px solid orange";
+	}
+	/*for(var r=0;r<board.length;r++){
+		row = rows[r].getElementsByTagName("td");
+		for(var c=0;c<row.length;c++){
+			if(r*1==excly*1&&c*1==exclx*1)continue;
+			var doit = false;
+			for(var bli=0;bli<blinkers.length;bli++)if(blinkers[bli]*1==c*1){
+				doit = true;
+				break;
+			}
+			row[c].style.border = (row[c].style.border=="3px solid green" && doit)?"3px solid red":"3px solid green";
+			*/
+	
+	}catch(e){alert("Yblink error:\n"+e);}
 }
