@@ -10,6 +10,7 @@
 	  <h1 id="info"></h1>
 	  <div id="menutoggle"><b>Menu</b></div>
 	  <div id="menu" style="color:lightgreen;font-weight:heavy;">
+		<h1 ontouchstart="animating='down';menuOff();setTimeout(playZero,2000);">Zero Player Game</h1><br>
 		<h1 ontouchstart="animating='down';menuOff();setTimeout(playComputer,2000);">Single Player Game</h1><br>
 		<h1 ontouchstart="animating='down';menuOff();setTimeout(playMulti,2000);">Multiplayer Game</h1><br>
 		<h1>Difficulty</h1>
@@ -21,7 +22,7 @@
 		<h1>First Player</h1>
 		<input type=radio checked name="fp" style="height:20px;width:20px;color:pink;"><span style="color:white;font-size:20px;">Pink</span><br>
 		<input type=radio name="fp" style="height:20px;width:20px;color:black;"><span style="color:white;font-size:20px;">Black</span><br>
-		<h1>Multiplayer Dimensions</h1>
+		<h1>MP Grid
 		<select id="cols">
 		  <option value=7>7</option>
 		  <option value=8>8</option>
@@ -43,11 +44,11 @@
 		  <option value=13>13</option>
 		  <option value=14>14</option>
 		  <option value=15>15</option>
-		</select><br>
-		<input id="anti" type="checkbox" style="height:10px;width:10px;background:blue;"><span style="font-size:14px;color:blue;font-family:courier">Anti-Mode( Try to make your opponent get 4 in a row)</span></div>
+		</select></h1><br>
+		<input id="anti" type="checkbox" style="height:10px;width:10px;background:blue;"><span style="font-size:14px;color:blue;font-family:courier">Anti-Mode</span></div>
 	</center>
 	<script src="scripts.js"></script>
-	<span style="position:absolute;left:0px;bottom:0px;color:white;font-size:3px;">S.E.F.F.I.A.R 0.0.8a</span>
+	<span style="position:absolute;left:0px;bottom:0px;color:white;font-size:3px;">S.E.F.F.I.A.R 0.0.9</span>
 	<span style="position:absolute;right:0px;bottom:0px;color:white;font-size:3px;">Hood 2017</span>
 	</body>
 </html>		

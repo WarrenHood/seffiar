@@ -8,6 +8,7 @@ blinkers = [];
 yblinkers =[];
 exclx = -1;
 excly = -1;
+pause = false;
 function g(x){
 	return document.getElementById(x);
 }
@@ -180,6 +181,70 @@ function compSto(r,c){
 	}catch(e){
 		alert(e);
 	}
+}
+function colOf(x,swap){
+	if(!swap)return x=="x"?"Pink":"Black";
+	if(swap)return x=="x"?"Black":"Pink";
+}
+function playZero(){
+	blinkers = [];
+	gameOver=false;
+	blink();
+	if(localStorage.lookAhead == "tut"){
+		playTut();
+		return;
+	}
+	//alert(g("difficulty").value);
+	h=9;
+	w=7;
+	var hml = "";
+	board = [];
+	var wid = (window.innerWidth/w)*0.85-4+"px;";
+	grid.style.height = wid*w+"px";
+	grid.style.width = wid*w +"px";
+	for(var i=0;i<h;i++){
+		var r =[];
+		hml+="<tr class='row'>";
+		for(var j=0;j<w;j++){
+			r.push('.');
+			hml+="<td class='col' style='height:"+wid;
+			hml+="width:"+wid;
+			hml+="border:3px solid green;";
+			hml+="border-radius:100%;'";
+			hml +="></td>";
+		}
+		board.push(r);
+		hml+="</tr>";
+	}
+	grid.innerHTML=hml;
+	currentPlayer = 'o';
+	if(localStorage.firstP == "pink" )currentPlayer = "x";
+	show(colOf(currentPlayer)+" is thinking...",false);
+	setTimeout( playZ,1000);
+	
+}
+function playZ(){
+	if(pause){
+		setTimeout(playZ,500);
+		return;
+	}
+	var best = eval(localStorage.anti)?getWorst(board,currentPlayer):getBest(board,currentPlayer);
+	drop(board,best,currentPlayer,true);
+	//render();
+	won = vict(board,best);//check if player has won
+	
+		if(won){
+			show(colOf(currentPlayer,eval(localStorage.anti))+" wins!");
+			return;
+		}
+		else if(full(board)){
+		alert("It's a draw");
+		return;
+	}
+	// make computer play
+	currentPlayer = currentPlayer=="x"?"o":"x";
+	show(colOf(currentPlayer)+" is thinking...",false);
+	setTimeout(playZ,2000);
 }
 function playComputer(){
 	blinkers = [];
@@ -469,6 +534,7 @@ function menuOn(){
 		return;
 	}
 	try{
+	pause = true;
 	menu.innerHTML = menuhtm;
 	localStorage.lookAhead==2?g("easy").selected=true:
 	localStorage.lookAhead==3?g("normal").selected=true:
@@ -519,6 +585,7 @@ function menuOn(){
 }
 function menuOff(){
 	try{
+	pause = false;
 	var vel = 0;//0.5*winh*0.935*(winh*0.935+1);
 	var acc = 10;
 	var thisInt= setInterval(
