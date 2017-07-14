@@ -153,7 +153,7 @@ function compSto(r,c){
 	var dat = new Date();
 	var delta = dat.getTime() - tim;
 	if(delta<300)play(c);
-	else if(board[r][c] == ""+currentPlayer && good(r,c))sacrifice([[r,c]],function(){
+	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]],function(){
 		if(gameOver)return;
 		show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
@@ -176,7 +176,7 @@ function compSto(r,c){
 	currentPlayer = "x";
 	},1000);
 		
-	});
+	},true);
 	}catch(e){
 		alert(e);
 	}
@@ -568,7 +568,7 @@ function touchSto(r,c){
 	var dat = new Date();
 	var delta = dat.getTime() - tim;
 	if(delta<300)play2(c);
-	else if(board[r][c] == ""+currentPlayer && good(r,c))sacrifice([[r,c]]);
+	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]],null,true);
 	
 }
 function playMulti(){
@@ -787,7 +787,7 @@ function fullcheck(f){
 		}
 	}
 }
-function sacrifice(sacs,f){
+function sacrifice(sacs,f,force){
 	if(gameOver)return;
 	if(sacs.length == 0){
 		//alert("sacs done");
@@ -823,6 +823,7 @@ function sacrifice(sacs,f){
 		}
 		
 	}
+	if(destroy.length == 0 && force)destroy = sacs;
 	if(destroy.length == 0){
 		fullcheck(f);
 		if(gameOver)return;
@@ -851,7 +852,7 @@ function sacrifice(sacs,f){
 				else if(row == 0)bottoms.push(-1);
 			}
 		}
-		setTimeout( function(){fall(bottoms,f);},500);;
+		setTimeout( function(){fall(bottoms,f);},100);;
 	}
 	,1000);
 }
@@ -871,7 +872,7 @@ function fall(bottoms,f){
 	render();
 	if(hasDropped){setTimeout(function(){
 		fall(bottoms,f);
-	},500);
+	},100);
 	}
 	else{
 		var toDestroy = [];
