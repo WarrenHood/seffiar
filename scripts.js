@@ -630,7 +630,7 @@ function play2(col){
 	}
 	if(currentPlayer==".")return;
 	currentPlayer = currentPlayer=="x"?"o":"x";
-	show((currentPlayer=="x"?"Pink's":"Black's")+" Turn");
+	show((currentPlayer=="x"?"Pink's":"Black's")+" turn (Long touch existing discs to sacrifice)");
 	}
 	}
 	catch(e){
