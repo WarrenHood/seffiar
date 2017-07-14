@@ -794,6 +794,7 @@ function sacrifice(sacs,f,force){
 		
 	}
 	var destroy = [];
+	if(!force){
 	for(var i=0;i<sacs.length;i++){
 		var pos = sacs[i];
 		
@@ -822,6 +823,7 @@ function sacrifice(sacs,f,force){
 		if(!desHas(destroy,pos[0],pos[1]))destroy.push(pos);
 		}
 		
+	}
 	}
 	if(destroy.length == 0 && force)destroy = sacs;
 	if(destroy.length == 0){
