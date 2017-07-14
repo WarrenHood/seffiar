@@ -827,7 +827,7 @@ function sacrifice(sacs,f){
 		fullcheck(f);
 		if(gameOver)return;
 		currentPlayer = currentPlayer=="x"?"o":'x';
-		show(currentPlayer=="x"?show("Pink's turn (Long touch existing discs to sacrifice)"):"Black's turn (Long touch existing discs to sacrifice)");
+		show(currentPlayer=="x"?"Pink's turn (Long touch existing discs to sacrifice)":"Black's turn (Long touch existing discs to sacrifice)");
 		if(f){
 			f();
 		}
