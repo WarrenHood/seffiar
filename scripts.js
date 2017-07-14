@@ -155,7 +155,7 @@ function compSto(r,c){
 	var dat = new Date();
 	var delta = dat.getTime() - tim;
 	if(delta<300)play(c);
-	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]],function(){
+	else if(board[r][c] == "x")sacrifice([[r,c]],function(){
 		if(gameOver)return;
 		show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
