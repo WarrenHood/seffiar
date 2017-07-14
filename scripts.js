@@ -568,7 +568,7 @@ function touchSto(r,c){
 	var dat = new Date();
 	var delta = dat.getTime() - tim;
 	if(delta<300)play2(c);
-	else if(board[r][c] == ""+currentPlayer)sacrifice([[r,c]]);
+	else if(board[r][c] == ""+currentPlayer && good(r,c))sacrifice([[r,c]]);
 	
 }
 function playMulti(){
