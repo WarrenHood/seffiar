@@ -6,6 +6,7 @@ localStorage.h = localStorage.h || 9;
 localStorage.anti = localStorage.anti || false;
 blinkers = [];
 yblinkers =[];
+mode = null;
 exclx = -1;
 excly = -1;
 pause = false;
@@ -187,6 +188,7 @@ function colOf(x,swap){
 	if(swap)return x=="x"?"Black":"Pink";
 }
 function playZero(){
+	mode="zp";
 	blinkers = [];
 	gameOver=false;
 	blink();
@@ -224,6 +226,7 @@ function playZero(){
 	
 }
 function playZ(){
+	if(mode != "zp")return;
 	if(pause){
 		setTimeout(playZ,500);
 		return;
@@ -247,6 +250,7 @@ function playZ(){
 	setTimeout(playZ,2000);
 }
 function playComputer(){
+	mode = null;
 	blinkers = [];
 	gameOver=false;
 	blink();
@@ -639,6 +643,7 @@ function touchSto(r,c){
 	
 }
 function playMulti(){
+	mode = null;
 	gameOver = false;
 	blinkers = [];
 	blink();
@@ -705,6 +710,7 @@ function play2(col){
 	}
 }
 function playTut(){
+	mode = null;
 	exclx = -1;
 	excly = -1;
 	//alert(g("difficulty").value);
