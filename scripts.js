@@ -895,7 +895,7 @@ function playTut(){
 	if(localStorage.firstP == "pink" )currentPlayer = "x";
 	if(currentPlayer == "x"){
 		show("Touch a column to drop a disc, try getting four in a row.");
-		blinkers = getBest(board,"x",2,true);
+		blinkers = getBesto(board,"x",2,true);
 		blink();
 		//alert("You are starting");
 	}
@@ -919,7 +919,7 @@ function playTut(){
 	}
 	// make computer play
 	show("Touch a column to drop a disc, try getting four in a row.");
-	blinkers = getBest(board,"x",2,true);
+	blinkers = getBesto(board,"x",2,true);
 	//alert(blinkers);
 	blink();
 	currentPlayer = "x";
@@ -964,7 +964,7 @@ function playT(col){
 	show("Touch a column to drop a disc, try getting four in a row.");
 	// make computer play
 	currentPlayer = "x";
-	blinkers = getBest(board,"x",2,true);
+	blinkers = getBesto(board,"x",2,true);
 	//alert(blinkers);
 	blink();
 	},1000);
@@ -1024,7 +1024,7 @@ function sacrifice(sacs,f,force){
 	if(!force){
 	for(var i=0;i<sacs.length;i++){
 		var pos = sacs[i];
-		
+		/*
 		if(board[pos[0]][pos[1]]==".")continue;
 		if(pos[0] > 0 && compb(pos,pos[0]-1,pos[1])){if(!desHas(destroy,pos[0]-1,pos[1]))destroy.push([pos[0]-1,pos[1]]);
 		if(pos[0] > 1 && compb(pos,pos[0]-2,pos[1])){if(!desHas(destroy,pos[0]-2,pos[1]))destroy.push([pos[0]-2,pos[1]]);
@@ -1036,7 +1036,7 @@ function sacrifice(sacs,f,force){
 		if(pos[0]+2 < board.length && compb(pos,pos[0]+2,pos[1])){if(!desHas(destroy,pos[0]+2,pos[1]))destroy.push([pos[0]+2,pos[1]]);
 		if(pos[0]+3 < board.length && compb(pos,pos[0]+3,pos[1]))if(!desHas(destroy,pos[0]+3,pos[1]))destroy.push([pos[0]+3,pos[1]]);}
 		if(!desHas(destroy,pos[0],pos[1]))destroy.push(pos);
-		}
+		}*/
 		
 		if(pos[1]+1 < board[0].length && compb(pos,pos[0],pos[1]+1)){if(!desHas(destroy,pos[0],pos[1]+1))destroy.push([pos[0],pos[1]+1]);
 		if(pos[1]+2 < board[0].length && compb(pos,pos[0],pos[1]+2)){if(!desHas(destroy,pos[0],pos[1]+2))destroy.push([pos[0],pos[1]+2]);
@@ -1100,6 +1100,16 @@ function fall(bottoms,f){
 	}
 	render();
 	if(hasDropped){setTimeout(function(){
+		
+		for(var col=0;col<board[0].length;col++){
+			for(var row=board.length-1;row>=0;row--){
+				if(board[row][col] == "."){
+					if(row > bottoms[col])bottoms[col] = row;
+					break;
+				}
+				else if(row == 0)bottoms.push(-1);
+			}
+		}
 		fall(bottoms,f);
 	},100);
 	}
