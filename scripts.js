@@ -10,6 +10,51 @@ mode = null;
 exclx = -1;
 excly = -1;
 pause = false;
+that = false;
+window.onerror = function (message, url, lineNo){
+    alert('Error: ' + message + '\n' + 'Line Number: ' + lineNo);
+    return true;
+}
+function bestM(b,p,l,arr){
+	that.restartGame(l);
+	for(var r=b.length-1;r>=0;r--){
+		for(var c=0;c<b[0].length;c++){
+			if(b[r][c] == p){
+				that.board.player = 1;
+				that.round = 1;
+				that.place(c);
+			}
+			else if(b[r][c] != "."){
+				that.board.player = 0;
+				that.round = 0;
+				that.place(c);
+			}
+		}
+	}
+	that.board.player = 1;
+	that.round = 1;
+	return that.generateComputerDecision(arr);
+}
+function worstM(b,p,l){
+	that.restartGame(l);
+	for(var r=b.length-1;r>=0;r--){
+		for(var c=0;c<b[0].length;c++){
+			if(b[r][c] == p){
+				that.board.player = 1;
+				that.round = 1;
+				that.place(c);
+			}
+			else if(b[r][c] != "."){
+				that.board.player = 0;
+				that.round = 0;
+				that.place(c);
+			}
+		}
+	}
+	that.board.player = 1;
+	that.round = 1;
+	return that.minimizePlay(that.board,l)[0];;
+}
 function g(x){
 	return document.getElementById(x);
 }
@@ -39,6 +84,9 @@ function handleSplash(){
 }
 //alert("script");
 window.onload = function(){
+	//alert("loaded");
+	try{
+	Start();
 	setTimeout(function(){
 	//handleSplash();
 	animating = "up";
@@ -91,7 +139,9 @@ window.onload = function(){
 	if(!(localStorage.lookAhead == "tut"))menuOn();
 	else playTut();
 	
-	},200);
+	},200);}catch(e){
+		alert("winload err:\n"+e);
+	}
 };
 function drop(b,c,p,anim){
 	//alert("dropping");
@@ -231,7 +281,7 @@ function playZ(){
 		setTimeout(playZ,500);
 		return;
 	}
-	var best = eval(localStorage.anti)?getWorst(board,currentPlayer):getBest(board,currentPlayer);
+	var best = eval(localStorage.anti)?getWorst(board,currentPlayer):(currentPlayer=="x"?getBest(board,currentPlayer):getBesto(board,currentPlayer));
 	drop(board,best,currentPlayer,true);
 	//render();
 	won = vict(board,best);//check if player has won
@@ -250,6 +300,7 @@ function playZ(){
 	setTimeout(playZ,2000);
 }
 function playComputer(){
+	
 	mode = null;
 	blinkers = [];
 	gameOver=false;
@@ -285,13 +336,14 @@ function playComputer(){
 	currentPlayer = 'o';
 	if(localStorage.firstP == "pink" )currentPlayer = "x";
 	if(currentPlayer == "x"){
+		if(that)that.round = 0;
 		show("Your Turn. (Long touch existing discs to sacrifice)");
 		//alert("You are starting");
 	}
 	else{
 		show("S.E.F.F.I.A.R is thinking...");
 		setTimeout(function(){
-		var best = eval(localStorage.anti)?getWorst(board):getBest(board);
+		var best = eval(localStorage.anti)?getWorst(board):getBest(board,"o");;
 	drop(board,best,"o",true);
 	//render();
 	won = vict(board,best);//check if player has won
@@ -313,7 +365,6 @@ function playComputer(){
 function play(col){
 	currentPlayer=="x" && valid(board,col)
 	?function(){
-		currentPlayer = "o";
 		drop(board,col,"x",true);
 		//render();
 		won = vict(board,col);//check if player has won
@@ -325,11 +376,17 @@ function play(col){
 		show("It's a draw!");
 		return;
 	}
+	currentPlayer = "o";
 	show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
 	setTimeout(function(){
-	var best = eval(localStorage.anti)?getWorst(board):getBest(board);
+	try{
+	var best = eval(localStorage.anti)?getWorst(board):getBest(board,"o");
+	//alert(best);
 	drop(board,best,"o",true);
+	}catch(e){
+		alert("AI error:\n"+e);
+	}
 	//render();
 	won = vict(board,best);//check if ai has won
 	
@@ -354,14 +411,23 @@ function color(p){
 }
 function getBest(b,cpl,lka,getArr){
 	try{
+	lka = lka || localStorage.lookAhead;
+	//alert("getting ready");
+	var col = bestM(b,cpl,lka,getArr);
+	//alert(col);
+	return col;
 	hscores = [];
 	lscores = [];
-	for(var i=0;i<(lka||localStorage.lookAhead)*2;i++){hscores.push(-10000000);lscores.push(10000000);}
+	for(var i=0;i<(lka||localStorage.lookAhead)*2;i++){hscores.push(-100000);lscores.push(100000);}
+	var ok = generateM(lka||localStorage.lookAhead);
+	bmovs(b,cpl||"o",lka||localStorage.lookAhead,0,ok );
 	var ok = generateM(lka||localStorage.lookAhead);
 	bmovs(b,cpl||"o",lka||localStorage.lookAhead,0,ok );
 	//alert(ok);
 	//alert("Potentials:\n"+ok);
 	//alert(JSON.stringify(ok));
+	//alert(hscores);
+	//alert(lscores);
 	var colsok = [];
 	for(var i = 0;i<ok.length;i++)if(valid(b,i))colsok.push(i);
 	for(var pos = 0;pos<ok[0].length;pos++){
@@ -384,6 +450,7 @@ function getBest(b,cpl,lka,getArr){
 	
 }
 function getWorst(b,cpl,lka){
+	return worstM(b,cpl,lka);
 	var ok= bmovs(b,cpl||"o",lka||localStorage.lookAhead );
 	//alert(ok);
 	var lowest = 1000000000;
@@ -478,11 +545,16 @@ function genA(n,w){
 	for(var i=0;i<n;i++)na.push(w);
 	return na;
 }
-function bmovs(b,p,l,count,arr,fcol,score,hscores,lscores){
+function bmovs(b,p,l,count,arr,fcol,score,amscore){
+	var ascore = amscore || [0];
 	var nsco = score || 0;
-	//if(nsco <= lscores[count])lscores[count] = nsco;
+	//alert(ascore);
+	hcomp(ascore);
+	lcomp(ascore);
+	//if(!lcomp(ascore))return;
+	//if(nsco > lscores[count])return;
 	//else return;
-	
+	//if(!lcomp(ascore))return;
 	var count = count || 0;
 	//var posScore = (b.length*b[0].length - count)*(b.length*b[0].length - count)*count==0?1000000:1;;
 	try{
@@ -495,7 +567,9 @@ function bmovs(b,p,l,count,arr,fcol,score,hscores,lscores){
 	}
 	for(var pl=0;pl<arr.length;pl++){
 		var db = copyB(b);
+		var nasco = cop(ascore);
 		if(!valid(db,pl)){
+			nasco.push(nsco);
 			continue;
 		}
 	
@@ -503,24 +577,48 @@ function bmovs(b,p,l,count,arr,fcol,score,hscores,lscores){
 		//alert("Phase1 drop "+pl+" "+p);
 		drop(db,pl,p);
 		if(vict(db,pl)){
-			arr[fcol][count]++;// = posScore;
+			// = posScore;
 			nsco++;
+			nasco.push(nsco);
+			//alert(nasco);
+			hcomp(nasco);
+			arr[fcol][count]++;
+			lcomp(nasco);
 		}
 		else{
-		//	if(nsco >= hscores[count+1])hscores[count+1] = nsco;
+			if(hscores[count+1] > 0)continue;
+			nasco.push(nsco);
+			
+			//if(!hcomp(nasco))continue;
+			hcomp(nasco);
+			lcomp(nasco);
+			//if(nsco < hscores[count+1])return;
 		//else return;
 			if(full(db))continue;
 			else{
 				for(var el=0;el<arr.length;el++){
+					var nasco2 = cop(nasco);
+					hcomp(nasco2);
+					lcomp(nasco2);
+					//if(!hcomp(nasco2))return;
 					db2 = copyB(db);
-					if(!valid(db2,el))continue;
+					if(!valid(db2,el)){continue;nasco2.push(nsco);}
 					drop(db2,el,enem);
 					if(vict(db2,el)){
-						arr[fcol][count+1]--;
 						nsco--;
+						nasco2.push(nsco);
+						arr[fcol][count+1]--;
+						lcomp(nasco2);
+						hcomp(nasco2);
 					}
+					
 					else{
-						bmovs(db2,p,l-1,count+2,arr,fcol,nsco,hscores,lscores);
+						if(lscores[count+2] < 0)continue;
+						nasco2.push(nsco);
+						//if(!lcomp(nasco2))continue;
+						hcomp(nasco2);
+						lcomp(nasco2);
+						bmovs(db2,p,l-1,count+2,arr,fcol,nsco,nasco2);
 					}
 				}
 			}
@@ -530,6 +628,20 @@ function bmovs(b,p,l,count,arr,fcol,score,hscores,lscores){
 	}catch(e){
 		alert("move calc error:\n"+e);
 	}
+}
+function hcomp(scos){
+	for(var i=0;i<scos.length;i++){
+		if(scos[i]*1 >= 1*hscores[i])hscores[i] = 1* scos[i];
+		else return false;
+	}
+	return true;
+}
+function lcomp(scos){
+	for(var i=0;i<scos.length;i++){
+		if(scos[i]*1 <= lscores[i]*1)lscores[i] = 1*scos[i];
+		else return false;
+	}
+	return true;
 }
 function generateM(l){
 	//alert("prepping");
@@ -582,6 +694,8 @@ function menuOn(){
 	menu.innerHTML = menuhtm;
 	localStorage.lookAhead==2?g("easy").selected=true:
 	localStorage.lookAhead==3?g("normal").selected=true:
+	localStorage.lookAhead==3.5?g("hard").selected=true:
+	localStorage.lookAheas==4?g("vhard").selected=trud:
 	g("tut").selected=true;
 	localStorage.firstP=="pink"?
 	document.getElementsByName("fp")[0].checked = true:
@@ -788,7 +902,7 @@ function playTut(){
 	else{
 		show("S.E.F.F.I.A.R is thinking...");
 		setTimeout(function(){
-		var best = getBest(board,"o",2);
+		var best = worstM(board,"o",1);
 	drop(board,best,"o",true);
 	//render();
 	blinkers = [];
@@ -832,7 +946,7 @@ function playT(col){
 	show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
 	setTimeout(function(){
-	var best = getBest(board,"o",2);
+	var best = worstM(board,"o",1);
 	drop(board,best,"o",true);
 	blinkers = [];
 	blink();
@@ -1025,3 +1139,356 @@ function yblink(){
 	
 	}catch(e){alert("Yblink error:\n"+e);}
 }
+function getBesto(b,cpl,lka,getArr){
+	var ok= bmovso(b,cpl||"o",lka||localStorage.lookAhead );
+	//alert(ok);
+	//alert("Potentials:\n"+ok);
+	var highest = -100000000;
+	//alert(highest);
+	for(var i=0;i<ok.length;i++)if(ok[i]>highest && valid(b,i))highest = ok[i]*1;
+	var best = [];
+	for(var i=0;i<ok.length;i++)if(ok[i]*1==highest*1 && valid(b,i))best.push(i);
+	//alert("Best:\n"+best);
+	return getArr?best:best[Math.floor(Math.random()*best.length)];
+	
+}
+function bmovso(b,p,l){
+	l = Math.floor(l);
+	try{
+	if(l==0){
+		var a = [];
+		for(var i=0;i<b[0].length;i++)a.push(0);
+		return a;
+	}
+	pm = [];
+	var enem = p=='x'?'o':'x';
+	if(full(b)){
+		var a = [];
+		for(var i=0;i<b[0].length;i++)a.push(0);
+		return a;
+	}
+	var pm = [];
+	for(var i=0;i<b[0].length;i++)pm.push(0);
+	for(var pl=0;pl<b[0].length;pl++){
+		var db = copyB(b);
+		if(!valid(db,pl)){
+			continue;
+		}
+		//alert("Phase1 drop "+pl+" "+p);
+		drop(db,pl,p);
+		if(vict(db,pl)){
+			pm[pl] = 1;
+			break;
+		}
+		else{
+			if(full(db))pm[pl] = 0;
+			else{
+				for(var el=0;el<b[0].length;el++){
+					db2 = copyB(db);
+					if(!valid(db2,el))continue;
+					drop(db2,el,enem);
+					if(vict(db2,el)){
+						pm[pl] = -1;
+						break;
+					}
+					else{
+						var res = bmovso(db2,p,l-1);
+						pm[pl] += (sum(res)/b[0].length)/b[0].length;
+					}
+				}
+			}
+		}
+	}
+	//alert(pm);
+	return pm;
+	}catch(e){
+		alert("move calc error:\n"+e);
+	}
+}
+
+/**
+ * Minimax (+Alpha-Beta) Implementation 
+ * @plain javascript version
+ */
+function Game() {
+    this.rows = 9; // Height
+    this.columns = 7; // Width
+    this.status = 0; // 0: running, 1: won, 2: lost, 3: tie
+    this.depth = 6; // Search depth
+    this.score = 100000, // Win/loss score
+    this.round = 0; // 0: Human, 1: Computer
+    this.winning_array = []; // Winning (chips) array
+    this.iterations = 0; // Iteration count
+    
+    that = this;
+
+    that.init();
+}
+
+Game.prototype.init = function() {
+    // Generate 'real' board
+    // Create 2-dimensional array
+    var game_board = new Array(that.rows);
+    for (var i = 0; i < game_board.length; i++) {
+        game_board[i] = new Array(that.columns);
+
+        for (var j = 0; j < game_board[i].length; j++) {
+            game_board[i][j] = null;
+        }
+    }
+
+    // Create from board object (see board.js)
+    this.board = new Board(this, game_board, 0);
+
+    // Generate visual board
+    var game_board = "";
+    for (var i = 0; i < that.rows; i++) {
+        game_board += "<tr>";
+        for (var j = 0; j < that.columns; j++) {
+            game_board += "<td class='empty'></td>";
+        }
+        game_board += "</tr>";
+    }
+	gb = document.createElement('table');
+    gb.innerHTML = game_board;
+
+    // Action listeners
+    var td = gb.getElementsByTagName("td");
+
+    for (var i = 0; i < td.length; i++) {
+        if (td[i].addEventListener) {
+            td[i].addEventListener('click', that.act, false);
+        } else if (td[i].attachEvent) {
+            td[i].attachEvent('click', that.act)
+        }
+    }
+}
+
+/**
+ * On-click event
+ */
+Game.prototype.act = function(e) {
+    var element = e.target || window.event.srcElement;
+
+    // Human round
+    if (that.round == 0) that.place(element.cellIndex);
+    
+    // Computer round
+    if (that.round == 1) that.generateComputerDecision();
+}
+
+Game.prototype.place = function(column) {
+    // If not finished
+    if (that.board.score() != that.score && that.board.score() != -that.score && !that.board.isFull()) {
+        for (var y = that.rows - 1; y >= 0; y--) {
+            if (gb.rows[y].cells[column].className == 'empty') {
+                if (that.round == 1) {
+                    gb.rows[y].cells[column].className = 'coin cpu-coin';
+                } else {
+                    gb.rows[y].cells[column].className = 'coin human-coin';
+                }
+                break;
+            }
+        }
+
+        if (!that.board.place(column)) {
+            return alert("Invalid move!");
+        }
+
+        that.round = that.switchRound(that.round);
+        that.updateStatus();
+    }
+}
+
+Game.prototype.generateComputerDecision = function(arr) {
+    if (that.board.score() != that.score && that.board.score() != -that.score && !that.board.isFull()) {
+        that.iterations = 0; // Reset iteration count
+        //document.getElementById('loading').style.display = "block"; // Loading message
+
+        // AI is thinking
+        
+            // Debug time
+            var startzeit = new Date().getTime();
+
+            // Algorithm call
+            var ai_move = that.maximizePlay(that.board, that.depth);
+
+            var laufzeit = new Date().getTime() - startzeit;
+            //document.getElementById('ai-time').innerHTML = laufzeit.toFixed(2) + 'ms';
+
+            // Place ai decision
+            that.place(ai_move[0]);
+			return arr?ai_move:ai_move[0];
+            // Debug
+           /* document.getElementById('ai-column').innerHTML = 'Column: ' + parseInt(ai_move[0] + 1);
+            document.getElementById('ai-score').innerHTML = 'Score: ' + ai_move[1];
+            document.getElementById('ai-iterations').innerHTML = that.iterations;
+
+            document.getElementById('loading').style.display = "none"; // Remove loading message*/
+    }
+}
+
+/**
+ * Algorithm
+ * Minimax principle
+ */
+Game.prototype.maximizePlay = function(board, depth, alpha, beta) {
+    // Call score of our board
+    var score = board.score();
+
+    // Break
+    if (board.isFinished(depth, score)) return [null, score];
+
+    // Column, Score
+    var max = [null, -99999];
+
+    // For all possible moves
+    for (var column = 0; column < that.columns; column++) {
+        var new_board = board.copy(); // Create new board
+
+        if (new_board.place(column)) {
+
+            that.iterations++; // Debug
+
+            var next_move = that.minimizePlay(new_board, depth - 1, alpha, beta); // Recursive calling
+
+            // Evaluate new move
+            if (max[0] == null || next_move[1] > max[1]) {
+                max[0] = column;
+                max[1] = next_move[1];
+                alpha = next_move[1];
+            }
+
+            if (alpha >= beta) return max;
+        }
+    }
+
+    return max;
+}
+
+Game.prototype.minimizePlay = function(board, depth, alpha, beta) {
+    var score = board.score();
+
+    if (board.isFinished(depth, score)) return [null, score];
+
+    // Column, score
+    var min = [null, 99999];
+
+    for (var column = 0; column < that.columns; column++) {
+        var new_board = board.copy();
+
+        if (new_board.place(column)) {
+
+            that.iterations++;
+
+            var next_move = that.maximizePlay(new_board, depth - 1, alpha, beta);
+
+            if (min[0] == null || next_move[1] < min[1]) {
+                min[0] = column;
+                min[1] = next_move[1];
+                beta = next_move[1];
+            }
+
+            if (alpha >= beta) return min;
+
+        }
+    }
+    return min;
+}
+
+Game.prototype.switchRound = function(round) {
+    // 0 Human, 1 Computer
+    if (round == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+Game.prototype.updateStatus = function() {
+    // Human won
+    if (that.board.score() == -that.score) {
+        that.status = 1;
+        that.markWin();
+        //alert("You have won!");
+    }
+
+    // Computer won
+    if (that.board.score() == that.score) {
+        that.status = 2;
+        that.markWin();
+        //alert("You have lost!");
+    }
+
+    // Tie
+    if (that.board.isFull()) {
+        that.status = 3;
+        //alert("Tie!");
+    }
+
+   /* var html = document.getElementById('status');
+    if (that.status == 0) {
+        html.className = "status-running";
+        html.innerHTML = "running";
+    } else if (that.status == 1) {
+        html.className = "status-won";
+        html.innerHTML = "won";
+    } else if (that.status == 2) {
+        html.className = "status-lost";
+        html.innerHTML = "lost";
+    } else {
+        html.className = "status-tie";
+        html.innerHTML = "tie";
+    }*/
+}
+
+Game.prototype.markWin = function() {
+    gb.className = "finished";
+    for (var i = 0; i < that.winning_array.length; i++) {
+        var name = gb.rows[that.winning_array[i][0]].cells[that.winning_array[i][1]].className;
+        gb.rows[that.winning_array[i][0]].cells[that.winning_array[i][1]].className = name + " win";
+    }
+}
+
+Game.prototype.restartGame = function(l) {
+    
+        // Dropdown value
+        //var difficulty = document.getElementById('difficulty');
+        var depth =l*2 || localStorage.lookAhead*2; //difficulty.options[difficulty.selectedIndex].value;
+        that.depth = depth;
+        that.status = 0;
+        that.round = 0;
+        that.init();
+        /*document.getElementById('ai-iterations').innerHTML = "?";
+        document.getElementById('ai-time').innerHTML = "?";
+        document.getElementById('ai-column').innerHTML = "Column: ?";
+        document.getElementById('ai-score').innerHTML = "Score: ?";
+        document.getElementById('game_board').className = "";*/
+        that.updateStatus();
+}
+
+/**
+ * Start game
+ */
+function Start() {
+    window.Game = new Game();
+}
+/*
+window.onload = function() {
+    Start();
+	/*setTimeout(function(){
+	that.board.player = 0;
+	that.place(6);
+	alert(that.board.field);
+	that.board.player = 0;
+	that.place(6);
+	alert(that.board.field);
+	that.board.player = 0;
+	that.place(6);
+	that.board.player = 0;
+	alert(that.board.field);
+	that.board.player = 1;
+	that.generateComputerDecision();
+	alert(that.board.field);
+	},1000);
+*/
