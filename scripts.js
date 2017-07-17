@@ -11,12 +11,31 @@ exclx = -1;
 excly = -1;
 pause = false;
 that = false;
+sacrificing = false;
+
+/*
+timeout computer if sacrifice in progress
+*/
 window.onerror = function (message, url, lineNo){
     alert('Error: ' + message + '\n' + 'Line Number: ' + lineNo);
     return true;
 }
+function dd(){
+	var count = 0;
+	for(var i=0;i<board.length;i++){
+		for(var j=0;j<board[0].length;j++){
+			if(board[i][j] != ".")count++;
+		}
+	}
+	var l = 3;
+	var m = 8;
+	var blen = board.length*board[0].length;
+	var nl = Math.round(l + (count/blen)*(m-l));
+	alert("using diff:"+nl);
+	return nl;
+}
 function bestM(b,p,l,arr){
-	that.restartGame(l);
+	that.restartGame(eval(l));
 	for(var r=b.length-1;r>=0;r--){
 		for(var c=0;c<b[0].length;c++){
 			if(b[r][c] == p){
@@ -36,7 +55,7 @@ function bestM(b,p,l,arr){
 	return that.generateComputerDecision(arr);
 }
 function worstM(b,p,l){
-	that.restartGame(l);
+	that.restartGame(eval(l));
 	for(var r=b.length-1;r>=0;r--){
 		for(var c=0;c<b[0].length;c++){
 			if(b[r][c] == p){
@@ -127,7 +146,7 @@ window.onload = function(){
 			hml+="width:"+wid;
 			hml+="border:3px solid green;";
 			hml+="border-radius:100%;";
-			hml+="' ontouchstart='play("+j+");' ";
+			hml+="'";
 			hml +="></td>";
 		}
 		board.push(r);
@@ -152,7 +171,7 @@ function drop(b,c,p,anim){
 		a.push(r);
 		r++;}
 	//alert("Dropped in row "+r-1);
-	if(!valid(b,c))alert("Error! Attempted to drop in invalid column");
+	//if(!valid(b,c))alert("Error! Attempted to drop in invalid column");
 	b[r-1][c] = p;
 	if(anim){
 		blinkers=[];
@@ -206,11 +225,13 @@ function compSto(r,c){
 	var delta = dat.getTime() - tim;
 	if(delta<300)play(c);
 	else if(board[r][c] == "x")sacrifice([[r,c]],function(){
-		if(gameOver)return;
+		if(gameOver || sacrificing)return;
 		show("S.E.F.F.I.A.R is thinking...");
 	//alert("ai");
 	setTimeout(function(){
-	var best = eval(localStorage.anti)?getWorst(board):getBest(board);
+	if(sacrificing)return;
+	var best = eval(localStorage.anti)?getWorst(board,"o"):getBest(board,"o");
+	if(sacrificing)return;
 	drop(board,best,"o",true);
 	//render();
 	won = vict(board,best);//check if ai has won
@@ -369,10 +390,12 @@ function play(col){
 		//render();
 		won = vict(board,col);//check if player has won
 		if(won){
+			gameOver = true;
 			show(eval(localStorage.anti)?"S.E.F.F.I.A.R wins!":"Player wins!");
 			return;
 	}
 	else if(full(board)){
+		gameOver = true;
 		show("It's a draw!");
 		return;
 	}
@@ -391,10 +414,12 @@ function play(col){
 	won = vict(board,best);//check if ai has won
 	
 		if(won){
+			gameOver = true;
 			show(eval(localStorage.anti)?"Player wins!":"S.E.F.F.I.A.R wins!");
 			return;
 		}
 		else if(full(board)){
+		gameOver = true;
 		show("It's a draw!");
 		return;
 	}
@@ -411,7 +436,9 @@ function color(p){
 }
 function getBest(b,cpl,lka,getArr){
 	try{
+	if(sacrificing)alert("the sacrifice aint done!");
 	lka = lka || localStorage.lookAhead;
+	lka = eval(lka);
 	//alert("getting ready");
 	var col = bestM(b,cpl,lka,getArr);
 	//alert(col);
@@ -450,6 +477,7 @@ function getBest(b,cpl,lka,getArr){
 	
 }
 function getWorst(b,cpl,lka){
+	lka = eval(lka);
 	return worstM(b,cpl,lka);
 	var ok= bmovs(b,cpl||"o",lka||localStorage.lookAhead );
 	//alert(ok);
@@ -695,7 +723,8 @@ function menuOn(){
 	localStorage.lookAhead==2?g("easy").selected=true:
 	localStorage.lookAhead==3?g("normal").selected=true:
 	localStorage.lookAhead==3.5?g("hard").selected=true:
-	localStorage.lookAheas==4?g("vhard").selected=trud:
+	localStorage.lookAhead==4?g("vhard").selected=true:
+	localStorage.lookAhead=="dd()"?g("dd").selected=true:
 	g("tut").selected=true;
 	localStorage.firstP=="pink"?
 	document.getElementsByName("fp")[0].checked = true:
@@ -1016,6 +1045,7 @@ function fullcheck(f){
 }
 function sacrifice(sacs,f,force){
 	if(gameOver)return;
+	sacrificing = true
 	if(sacs.length == 0){
 		//alert("sacs done");
 		
@@ -1056,9 +1086,10 @@ function sacrifice(sacs,f,force){
 	if(destroy.length == 0){
 		fullcheck(f);
 		if(gameOver)return;
+		sacrificing = false;
 		currentPlayer = currentPlayer=="x"?"o":'x';
 		show(currentPlayer=="x"?"Pink's turn (Long touch existing discs to sacrifice)":"Black's turn (Long touch existing discs to sacrifice)");
-		if(f){
+		if(f && !sacrificing){
 			f();
 		}
 		return;
@@ -1086,6 +1117,7 @@ function sacrifice(sacs,f,force){
 	,1000);
 }
 function fall(bottoms,f){
+	sacrificing = true;
 	try{
 	//alert("falling");
 	var hasDropped = false;
