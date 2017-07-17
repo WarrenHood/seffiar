@@ -28,10 +28,10 @@ function dd(){
 		}
 	}
 	var l = 3;
-	var m = 8;
+	var m = 6.5;
 	var blen = board.length*board[0].length;
 	var nl = Math.round(l + (count/blen)*(m-l));
-	alert("using diff:"+nl);
+	//alert("using diff:"+nl);
 	return nl;
 }
 function bestM(b,p,l,arr){
