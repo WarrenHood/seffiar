@@ -9,6 +9,8 @@
   border:2px solid Azure;
   border-bottom-color:YellowGreen;
   border-top-color:YellowGreen;
+  padding-bottom:0.5px;
+  margin-bottom:0.5px;
 }
 #splash{
   z-index:1;
@@ -61,6 +63,8 @@ overflow:hidden;
   background:rgba(150,100,800,0.8);
 }
 #info{
+  padding-top:0.5px;
+  margin-top:0.5px;
   color:orange;
   font-family:courier;
 }
