@@ -1,9 +1,9 @@
 #reset{
-  height:50px;
-  width:100px;
+ // height:50px;
+//  width:100px;
   background:red;
   color:white;
-  font-size:20px;
+  font-size:22px;
   border-bottom-right-radius:30px;
   border-top-left-radius:30px;
   border:2px solid Azure;
