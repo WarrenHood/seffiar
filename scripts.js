@@ -21,7 +21,6 @@ window.onerror = function (message, url, lineNo){
     alert('Error: ' + message + '\n' + 'Line Number: ' + lineNo);
     return true;
 }
-
 function dd(){
 	var count = 0;
 	for(var i=0;i<board.length;i++){
@@ -719,7 +718,8 @@ function menuOn(){
 	//if(animating)return;
 	//alert(animating);
 	menu.style.display = "";
-	
+	winw = max(window.innerWidth,winw);
+    winh = max(window.innerHeight,winh);
 	//g("difficulty").value = localStorage.lookAhead;
 	if(parseInt(mtog.style.bottom)>0){
 		animating = "down";
