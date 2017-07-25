@@ -12,7 +12,8 @@ excly = -1;
 pause = false;
 that = false;
 sacrificing = false;
-
+playin = false;
+stayAwake = true;
 /*
 timeout computer if sacrifice in progress
 */
@@ -20,6 +21,7 @@ window.onerror = function (message, url, lineNo){
     alert('Error: ' + message + '\n' + 'Line Number: ' + lineNo);
     return true;
 }
+
 function dd(){
 	var count = 0;
 	for(var i=0;i<board.length;i++){
@@ -27,8 +29,8 @@ function dd(){
 			if(board[i][j] != ".")count++;
 		}
 	}
-	var l = 3;
-	var m = 6.5;
+	var l = 5;
+	var m = 15;
 	var blen = board.length*board[0].length;
 	var nl = Math.round(l + (count/blen)*(m-l));
 	//alert("using diff:"+nl);
@@ -107,6 +109,7 @@ window.onload = function(){
 	try{
 	Start();
 	setTimeout(function(){
+	if(stayAwake)window.plugins.insomnia.keepAwake();
 	//handleSplash();
 	animating = "up";
 	winw = window.innerWidth;
@@ -164,6 +167,7 @@ window.onload = function(){
 };
 function drop(b,c,p,anim){
 	//alert("dropping");
+	playin = true;
 	a=[];
 	try{
 	var r = 0;
@@ -186,7 +190,7 @@ function drop(b,c,p,anim){
 				row[col].style.border = ro==r-1&&col==c?"3px solid red":row[col].style.border;
 			}
 		}
-	
+	playin = false;
 	}
 	}catch(e){alert("Drop error:\n"+e+" cp(r)/anim "+ c + " "+p+"("+(r-1)+")/"+anim);}
 }
@@ -260,6 +264,9 @@ function colOf(x,swap){
 }
 function playZero(){
 	mode="zp";
+	g("reset").ontouchstart = function(){
+		if(confirm("Reset the current game?"))playZero();
+	};
 	blinkers = [];
 	gameOver=false;
 	blink();
@@ -321,7 +328,9 @@ function playZ(){
 	setTimeout(playZ,2000);
 }
 function playComputer(){
-	
+	g("reset").ontouchstart = function(){
+		if(confirm("Reset the current game?"))playComputer();
+	};
 	mode = null;
 	blinkers = [];
 	gameOver=false;
@@ -724,6 +733,9 @@ function menuOn(){
 	localStorage.lookAhead==3?g("normal").selected=true:
 	localStorage.lookAhead==3.5?g("hard").selected=true:
 	localStorage.lookAhead==4?g("vhard").selected=true:
+	localStorage.lookAhead==5.5?g("vvhard").selected=true:
+	localStorage.lookAhead==7?g("omg").selected=true:
+	localStorage.lookAhead==10?g("wtf").selected=true:
 	localStorage.lookAhead=="dd()"?g("dd").selected=true:
 	g("tut").selected=true;
 	localStorage.firstP=="pink"?
@@ -830,6 +842,9 @@ function playMulti(){
 	gameOver = false;
 	blinkers = [];
 	blink();
+	g("reset").ontouchstart = function(){
+		if(confirm("Reset the current game?"))playMulti();
+	};
 	//alert(g("difficulty").value);
 	h=localStorage.h;
 	w=localStorage.w;
@@ -1045,7 +1060,7 @@ function fullcheck(f){
 }
 function sacrifice(sacs,f,force){
 	if(gameOver)return;
-	sacrificing = true
+	sacrificing = true;
 	if(sacs.length == 0){
 		//alert("sacs done");
 		
